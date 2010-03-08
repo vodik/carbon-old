@@ -1,5 +1,5 @@
-#ifndef CHAI_TERM_H
-#define CHAI_TERM_H
+#ifndef CARBON_TERM_H
+#define CARBON_TERM_H
 
 typedef struct tty_t tty_t;
 typedef void (*shellfn)();

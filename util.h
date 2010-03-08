@@ -1,5 +1,5 @@
-#ifndef UTIL_H__
-#define UTIL_H__
+#ifndef CARBON_UTIL
+#define CARBON_UTIL
 
 #include <stdio.h>
 #include <string.h>
