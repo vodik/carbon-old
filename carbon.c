@@ -7,46 +7,77 @@
 #include <sys/wait.h>
 #include <sys/select.h>
 #include <xcb/xcb.h>
+#include <xcb/xcb_event.h>
+#include <xcb/xcb_keysyms.h>
+#include <X11/keysym.h>
+#include <X11/Xlib.h>
 
 #include "tty.h"
 #include "util.h"
 #include "buffer.h"
 
+#include "key.h"
+
 #define TERM "carbon-256color"
-static const char fontname[] = "-*-terminus-medium-r-normal-*-12-*-*-*-*-*-*-*";
 
 xcb_connection_t *conn;
+xcb_key_symbols_t *keysyms;
 tty_t *tty;
+
+typedef struct {
+	xcb_keysym_t ksym;
+	char str[16];
+} Key;
+
+#include "config.h"
 
 static void expose(xcb_generic_event_t *event);
 static void keypress(xcb_generic_event_t *event);
 
-//static void (*handler[LASTEvent])(xcb_generic_event_t *) = {
-static void (*handler[14])(xcb_generic_event_t *) = {
+static void (*handler[127])(xcb_generic_event_t *) = {
 	[XCB_EXPOSE] = expose,
-	[XCB_KEY_RELEASE] = keypress,
+	[XCB_KEY_PRESS] = keypress,
 };
 
 static void expose(xcb_generic_event_t *event)
 {
 }
 
-static void keypress(xcb_generic_event_t *e)
+char *keymap(xcb_keysym_t ksym)
 {
-	xcb_key_release_event_t *event = (xcb_key_release_event_t *)e;
-	//printf("keypress\n");a
-	//char c = (char)event->detail;
-	//printf("send: %d\n", event->detail.key);
-	//printf("send: %c\n", c);
-	//tty_send(tty, c);
+	int i;
+	for (i = 0; i < sizeof(key) / sizeof(Key); ++i)
+		if (key[i].ksym == ksym)
+			return key[i].str;
+	return NULL;
 }
 
-/*static const buf_t buffer = {
-	.putc_ = mybuf_putc;
-	.puttab = mybuf_puttab;
-	.putcr = mybuf_putcr;
-	.putnl = mybuf_putnl;
-}*/
+static void keypress(xcb_generic_event_t *e)
+{
+	xcb_key_press_event_t *event = (xcb_key_release_event_t *)e;
+	xcb_keysym_t ksym = key_getkeysym(keysyms, event->detail, event->state);
+	char buf[32];
+	char *keybind = NULL;
+	int len;
+
+	int ctrl = event->state & ControlMask;
+	if (ctrl)
+		printf("control character\n");
+
+	if (keybind = keymap(ksym)) {
+		tty_send(tty, keybind, strlen(keybind));
+	}
+	else if (len = key_press_lookup_string(ksym, buf, 32))
+		if (ctrl) {
+			/* TODO: investigate, this is probably not a sane way to do this */
+			/* I should be reading capital letters, then subtracting by '@',
+			 * '`' works only because its 'a' - 'A' more than '@' */
+			buf[0] -= '`';
+			tty_send(tty, buf, 1);
+		}
+		else
+			tty_send(tty, buf, len);
+}
 
 static void diecookie(xcb_void_cookie_t cookie, const char *err, ...)
 {
@@ -85,6 +116,9 @@ static void xinit()
 		die("couldn't get the current screen\n");
 	}
 
+	keysyms = xcb_key_symbols_alloc(conn);
+	xcb_get_modifier_mapping_cookie_t xmapping_cookie = xcb_get_modifier_mapping_unchecked(conn);
+
 	xcb_font_t font = xcb_generate_id(conn);
 	cookie = xcb_open_font_checked(conn,
 			font,
@@ -97,9 +131,9 @@ static void xinit()
 	uint32_t mask = XCB_CW_BACK_PIXEL | XCB_CW_EVENT_MASK;
 	uint32_t values[2];
 	values[0] = screen->white_pixel;
-	values[1] = XCB_EVENT_MASK_KEY_RELEASE |
-	            XCB_EVENT_MASK_BUTTON_PRESS |
-	            XCB_EVENT_MASK_POINTER_MOTION |
+	values[1] = XCB_EVENT_MASK_KEY_PRESS |
+	            /*XCB_EVENT_MASK_BUTTON_PRESS |
+	            XCB_EVENT_MASK_POINTER_MOTION |*/
 	            XCB_EVENT_MASK_EXPOSURE;
 
 	cookie = xcb_create_window_checked(conn,

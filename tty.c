@@ -311,9 +311,9 @@ static void tty_put(tty_t *t, char *buf, int len)
 	}
 }
 
-void tty_send(tty_t *t, char c)
+void tty_send(tty_t *t, const char *str, int len)
 {
-	if(write(t->fd, &c, 1) == -1)
+	if(write(t->fd, str, len) == -1)
 		die("write error on tty\n");
 }
 

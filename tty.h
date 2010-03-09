@@ -17,7 +17,7 @@ void tty_destroy(tty_t *);
 void tty_resize(tty_t *, int rows, int cols);
 
 void tty_read(tty_t *);
-void tty_send(tty_t *, char c);
+void tty_send(tty_t *, const char *str, int len);
 
 int tty_getfd(tty_t *);
 
