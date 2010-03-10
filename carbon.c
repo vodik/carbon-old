@@ -153,6 +153,9 @@ static void xinit()
 	xcb_flush(conn);
 }
 
+xwindow_t *xw;
+dc_t *dc;
+
 static void run()
 {
 	int xcbfd = xcb_get_file_descriptor(conn);
@@ -173,7 +176,7 @@ static void run()
 		/* if there is input from our tty, draw it */
 		if (FD_ISSET(ttyfd, &rfd)) {
 			tty_read(tty);
-			/* TODO: render out */
+			termbuf_draw(buf, xw, dc);
 		}
 
 		/* always check for xcb events. some may have arived durring

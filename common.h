@@ -1,6 +1,8 @@
 #ifndef CARBON_COMMON_H
 #define CARBON_COMMON_H
 
+#include <xcb/xcb.h>
+
 /* TODO: Refractor this. I'm not sure where this belongs to logically, so
  * I'm breaking it out into its own file for now.
  *
@@ -37,5 +39,19 @@ typedef struct {
 	int x;
 	int y;
 } cursor_t;
+
+typedef struct {
+	xcb_connection_t *conn;
+	xcb_window_t win;
+	int str;
+	int width;
+	int height;
+	int charwidth;
+	int charheight;
+} xwindow_t;
+
+typedef struct {
+	xcb_gcontext_t gc;
+} dc_t;
 
 #endif

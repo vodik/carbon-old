@@ -2,10 +2,12 @@
 #define CARBON_BUFFER_H
 
 #include "tty.h"
+#include "common.h"
 
 typedef struct termbuf_t termbuf_t;
 
 termbuf_t *termbuf_create(int width, int height);
+void termbuf_draw(termbuf_t *, xwindow_t *xw, dc_t *dc);
 
 void termbuf_putchar(void *, char c);
 void termbuf_puttab(void *);
