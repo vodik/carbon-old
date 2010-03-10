@@ -58,7 +58,7 @@ void xscroll(xwindow_t *xw, dc_t *dc, termbuf_t *b)
 /* TODO: seperate attributes from the glyph, then combine into glyph. that way this is called
  * with attr_t. Its the only reason why we pass around base. It be more intuitive for understanding
  * the code by looking at it */
-void xdrawbuf(char *buf, glyph_t base, int x, int y, int len)
+void xdrawbuf(char *buf, attr_t base, int x, int y, int len)
 {
 }
 
@@ -68,11 +68,12 @@ void xdrawbuf(char *buf, glyph_t base, int x, int y, int len)
 void termbuf_draw(termbuf_t *b, xwindow_t *xw, dc_t *dc)
 {
 	int i, x, y, ox;
-	glyph_t base, new;
+	attr_t base;
+	glyph_t new;
 	char buf[MAXDRAWBUF];
 
 	for (y = 0; y < b->rows; ++y) {
-		base = b->lines[y][0];
+		base = b->lines[y][0].attr;
 		i = ox = 0;
 		for (x = 0; x < b->cols; ++x) {
 			new = b->lines[y][x];
@@ -85,7 +86,7 @@ void termbuf_draw(termbuf_t *b, xwindow_t *xw, dc_t *dc)
 				buf[0] = new.c;
 				i = 1;
 				ox = x;
-				base = new;
+				base = new.attr;
 			}
 		}
 		/* draw out the residual */
@@ -159,9 +160,9 @@ void termbuf_putchar(void *vb, char c)
 	int y = b->cursor.y;
 	glyph_t *glyph = &b->lines[y][x];
 
-	*glyph = b->cursor.attr;
+	glyph->attr = b->cursor.attr;
 	glyph->c = c;
-	glyph->state |= CRset | CRupdate;
+	glyph->attr.state |= CRset | CRupdate;
 }
 
 void termbuf_puttab(void *vb)

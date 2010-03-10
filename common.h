@@ -24,17 +24,21 @@ enum { TMwrap=1, TMinsert=2 };
 typedef int color_t;
 
 typedef struct {
-	char c;           /* character code */
 	char mode;        /* attribute flags */
 	color_t fg;       /* foreground */
 	color_t bg;       /* background */
 	char state;       /* state flag */
+} attr_t;
+
+typedef struct {
+	attr_t attr;
+	char c;           /* character code */
 } glyph_t;
 
 typedef glyph_t *line_t;
 
 typedef struct {
-	glyph_t attr;       /* current character attributes */
+	attr_t attr;      /* current character attributes */
 	char hidden;
 	int x;
 	int y;
