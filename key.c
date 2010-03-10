@@ -30,7 +30,7 @@
 #include <X11/keysym.h>
 #include <X11/XF86keysym.h>
 #include <string.h>
-#include "autil.h"
+#include "str.h"
 
 #include "keysym_unicode.h"
 

@@ -88,11 +88,13 @@ static int esc_grab(esc_t *e, char c)
 }
 
 /* apply the escape sequence's effect */
-static void esc_applyCSI(esc_t *e, buf_t *buf)
+static void esc_applyCSI(esc_t *e, const buf_t *bufimpl, void *buf)
 {
 	switch(e->mode) {
 		/* insert [0] blank characters */
 		case '@':
+			if (bufimpl->insertblank)
+				bufimpl->insertblank(buf, e->args[0] ? e->args[0] : 1);
 			break;
 		/* move cursor up [0] */
 		case 'A':
@@ -172,11 +174,11 @@ static void esc_applyCSI(esc_t *e, buf_t *buf)
 	}
 }
 
-static void esc_apply(esc_t *e, buf_t *buf)
+static void esc_apply(esc_t *e, const buf_t *bufimpl, void *buf)
 {
 	switch (e->pre) {
 		case CSI:
-			esc_applyCSI(e, buf);
+			esc_applyCSI(e, bufimpl, buf);
 			break;
 		default:
 			fprintf(stderr, "Could not understand escape sequence\n");
@@ -280,7 +282,7 @@ static void tty_put(tty_t *t, char *buf, int len)
 		else if (t->in_esc) {
 			t->in_esc = esc_grab(t->esc, c);
 			if (!t->in_esc)
-				esc_apply(t->esc, t->buf);
+				esc_apply(t->esc, t->bufimpl, t->buf);
 		}
 		else switch(c) {
 			/* handle tab */

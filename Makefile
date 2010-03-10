@@ -2,7 +2,7 @@ CC=clang
 CFLAGS=-Wall -pedantic `pkg-config --cflags xcb xcb-keysyms` --std=c99 -g
 LDFLAGS=`pkg-config --libs xcb xcb-keysyms`
 
-SRC = tty.c util.c buffer.c key.c carbon.c autil.c
+SRC = tty.c util.c buffer.c key.c carbon.c str.c
 OBJ = ${SRC:.c=.o}
 
 all: carbon

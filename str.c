@@ -26,7 +26,7 @@
 #include <limits.h>
 #include <fcntl.h>
 
-#include "autil.h"
+#include "str.h"
 #include "util.h"
 
 /** \brief safe limited strcpy.

@@ -10,6 +10,15 @@ typedef struct buf_t {
 	void (*puttab)(void *);
 	void (*putcr)(void *);
 	void (*putnl)(void *);
+
+	void (*insertblank)(void *, int n);
+	void (*insertblankline)(void *, int n);
+	void (*deletechar)(void *, int n);
+	void (*moveto)(void *, int x, int y);
+	void (*clearregion)(void *, int x1, int y1, int x2, int y2);
+
+	void (*savecursor)(void *);
+	void (*loadcursor)(void *);
 } buf_t;
 
 tty_t *tty_create(int rows, int cols, shellfn shell, const buf_t *bufimpl, void *buf);
