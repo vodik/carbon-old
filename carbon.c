@@ -197,7 +197,9 @@ void shell()
 int main(int argc, char *argv[])
 {
 	xinit();
-	tty = tty_create(80, 24, shell, &termbuf_impl, NULL);
+	/* only one of these should set size */
+	buf = termbuf_create(80, 24);
+	tty = tty_create(80, 24, shell, &termbuf_impl, buf);
 
 	run();
 }

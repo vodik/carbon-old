@@ -5,6 +5,8 @@
 
 typedef struct termbuf_t termbuf_t;
 
+termbuf_t *termbuf_create(int width, int height);
+
 void termbuf_putchar(void *, char c);
 void termbuf_puttab(void *);
 void termbuf_putcr(void *);
